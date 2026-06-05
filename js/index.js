@@ -151,7 +151,7 @@ btnSoumettre.addEventListener("click", async () => {
 });
 
 // ─── Affichage mur ────────────────────────────────────────────────────────────
-function afficherTout() {
+export function afficherTout() {
     mur.innerHTML = "";
 
     if (idees.length === 0) {
