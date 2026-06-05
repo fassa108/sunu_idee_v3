@@ -78,6 +78,7 @@ const enlive = supabase
         table : "idees"
     },
     () => {
+        idees = recupererIdees()
         afficherTout()
     }
 )
