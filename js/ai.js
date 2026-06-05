@@ -15,7 +15,7 @@ export async function genererCategorie(titre) {
                 "Authorization": `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`
             },
             body: JSON.stringify({
-                model: "mistralai/mistral-7b-instruct:free",
+                model: "poolside/laguna-xs.2:free",
                 messages: [{
                     role: "user",
                     content: `Tu es un assistant de classification. Réponds UNIQUEMENT avec l'une de ces valeurs exactes, sans majuscules, sans ponctuation, sans rien d'autre :
@@ -34,7 +34,7 @@ Classe ce titre : "${titre}"`
         const brut = donnee.choices[0].message.content.trim().toLowerCase();
         console.log("Réponse brute IA :", brut);
 
-        // Fallback — cherche une correspondance dans la réponse
+        
         const trouve = CATEGORIES_VALIDES.find(c => brut.includes(c));
         return trouve ?? "autre";
 
