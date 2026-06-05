@@ -200,7 +200,7 @@ window.ouvrirEdition = function(id) {
     editCategorie.value   = idee.categorie;
     editDescription.value = idee.description;
     modalEditer.show();
-};
+}; 
 
 btnSauvegarder.addEventListener("click", async () => {
     const titre       = editTitre.value.trim();

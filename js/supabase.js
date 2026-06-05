@@ -1,5 +1,6 @@
 
 import { createClient } from "@supabase/supabase-js";
+import {afficherTout} from "./index.js";
 
 const supabase = createClient(
     import.meta.env.VITE_SUPABASE_URL,
@@ -67,3 +68,16 @@ export async function modifierIdee(id, titre, categorie, description) {
 }
 
 
+const enlive = supabase
+.channel("realtime:idees")
+.on(
+    "postgres_changes",
+     {
+        event : "*",
+        schema : "public",
+        table : "idees"
+    },
+    () => {
+        afficherTout()
+    }
+)
