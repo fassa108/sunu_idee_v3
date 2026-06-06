@@ -1,6 +1,7 @@
 import { ajouterIdee, recupererIdees, supprimerIdee, modifierIdee } from "./supabase.js";
 import { genererCategorie } from "./ai.js";
 import { validerTitre, validerDescription } from "./validation.js";
+import {setOnChangement} from "./supabase.js"
 
 // ─── Modales ──────────────────────────────────────────────────────────────────
 const modalAjout  = new bootstrap.Modal(document.getElementById('modalAjouter'));
@@ -151,9 +152,9 @@ btnSoumettre.addEventListener("click", async () => {
 });
 
 // ─── Affichage mur ────────────────────────────────────────────────────────────
-export function afficherTout() {
+export async function afficherTout() {
     mur.innerHTML = "";
-
+    const idees = await recupererIdees();
     if (idees.length === 0) {
         messageVide.classList.remove("d-none");
         compteur.textContent = "0 idée(s)";
@@ -190,6 +191,7 @@ export function afficherTout() {
         mur.appendChild(col);
     });
 }
+setOnChangement(afficherTout);
 
 // ─── Édition ─────────────────────────────────────────────────────────────────
 window.ouvrirEdition = function(id) {
