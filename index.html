@@ -74,7 +74,7 @@
                 <!-- TITRE -->
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Titre</label>
-                    <input type="text" id="ajout-titre" class="form-control" maxlength="80">
+                    <input type="text" id="ajout-titre" class="form-control" maxlength="100">
                     <small id="erreur-titre" class="text-danger d-none"></small>
                 </div>
 
@@ -110,7 +110,7 @@
     </div>
 </div>
 
-<!-- MODAL EDIT -->
+<!-- MODAL EDIT  a supprimer et adapter la modal d'ajout-->
 <div class="modal fade" id="modalEditer" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
@@ -126,7 +126,8 @@
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Titre</label>
-                    <input type="text" id="edit-titre" class="form-control">
+                    <input type="text" id="edit-titre" class="form-control" maxlength="100">
+                    <small id="erreur-edit-titre" class="text-danger d-none"></small>
                 </div>
 
                 <div class="mb-3">
@@ -143,6 +144,7 @@
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Description</label>
                     <textarea id="edit-description" class="form-control" rows="4"></textarea>
+                    <small id="erreur-edit-description" class="text-danger d-none"></small>
                 </div>
 
             </div>

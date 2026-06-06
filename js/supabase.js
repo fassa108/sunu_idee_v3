@@ -5,14 +5,14 @@ const supabase = createClient(
     import.meta.env.VITE_SUPABASE_ANON_KEY
 );
 
-// ─── Callback realtime 
+// Callback realtime 
 let onChangement = null;
 
 export function setOnChangement(fn) {
     onChangement = fn;
 }
 
-// ─── CRUD 
+// CRUD 
 export async function ajouterIdee(titre, categorie, description) {
     const { data, error } = await supabase
         .from("idees")
@@ -60,7 +60,7 @@ export async function modifierIdee(id, titre, categorie, description) {
     return true;
 }
 
-// ─── Realtime ─────────────────────────────────────────────────────────────────
+// Realtime
 supabase
     .channel("realtime-idees")
     .on(
@@ -68,7 +68,7 @@ supabase
         { event: "*", schema: "public", table: "idees" },
         async (payload) => {
             console.log("Changement reçu :", payload);
-            if (onChangement) await onChangement(); // ✅ plus d'import circulaire
+            if (onChangement) await onChangement();
         }
     )
     .subscribe((status) => {

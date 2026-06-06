@@ -3,11 +3,11 @@ import { genererCategorie } from "./ai.js";
 import { validerTitre, validerDescription } from "./validation.js";
 import {setOnChangement} from "./supabase.js"
 
-// ─── Modales ──────────────────────────────────────────────────────────────────
+// Modales 
 const modalAjout  = new bootstrap.Modal(document.getElementById('modalAjouter'));
 const modalEditer = new bootstrap.Modal(document.querySelector("#modalEditer"));
 
-// ─── Sélecteurs ───────────────────────────────────────────────────────────────
+// Sélecteurs
 const btnAjouter      = document.getElementById('btn-ajouter');
 const inputTitre      = document.querySelector("#ajout-titre");
 const inputCategorie  = document.querySelector("#ajout-categorie");
@@ -21,13 +21,13 @@ const editCategorie   = document.querySelector("#edit-categorie");
 const editDescription = document.querySelector("#edit-description");
 const btnSauvegarder  = document.querySelector("#btn-sauvegarder");
 
-// ─── Données ──────────────────────────────────────────────────────────────────
+//  Données 
 let idees = await recupererIdees() || [];
 let idEnCoursEdition = null;
 
 inputCategorie.disabled = true;
 
-// ─── Constantes ───────────────────────────────────────────────────────────────
+// Constantes 
 const couleurs = {
     "pedagogie":              "#0d6efd",
     "evenement":              "#198754",
@@ -44,7 +44,7 @@ const CATEGORIES = [
     "autre"
 ];
 
-// ─── Erreurs inline ───────────────────────────────────────────────────────────
+// Erreurs inline
 function afficherErreur(id, message) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -68,7 +68,7 @@ function effacerErreurs() {
     afficherErreur("erreur-description", null);
 }
 
-// ─── Loading overlay ──────────────────────────────────────────────────────────
+// Loading overlay 
 function setLoading(actif) {
     const overlay = document.getElementById("overlay-loading");
     actif
@@ -76,7 +76,7 @@ function setLoading(actif) {
         : overlay.classList.add("d-none");
 }
 
-// ─── Formulaire ───────────────────────────────────────────────────────────────
+// Formulaire 
 function reinitialiserFormulaire() {
     inputTitre.value        = "";
     inputCategorie.value    = "";
@@ -90,18 +90,18 @@ async function sauvegarder(idee) {
     afficherTout();
 }
 
-// ─── Listeners ────────────────────────────────────────────────────────────────
+// Listeners 
 btnAjouter.addEventListener('click', () => modalAjout.show());
 
 // Validation temps réel
 inputTitre.addEventListener("input", () => {
-    const erreur = validerTitre(inputTitre.value.trim());
-    afficherErreur("erreur-titre", erreur !== inputTitre.value.trim() ? erreur : null);
+
+    afficherErreur("erreur-titre", validerTitre(inputTitre.value.trim()));
 });
 
 inputDescription.addEventListener("input", () => {
-    const erreur = validerDescription(inputDescription.value.trim());
-    afficherErreur("erreur-description", erreur);
+    afficherErreur("erreur-description", validerDescription(inputDescription.value.trim()));
+
 });
 
 // Catégorisation IA au blur
@@ -127,7 +127,7 @@ btnSoumettre.addEventListener("click", async () => {
     
 
     const erreurTitre = validerTitre(titre);
-    if (erreurTitre !== null) {
+    if (erreurTitre) {
         afficherErreur("erreur-titre", erreurTitre);
         return;
     }
@@ -138,7 +138,7 @@ btnSoumettre.addEventListener("click", async () => {
         return;
     }
 
-    setLoading(true);
+    
     try {
         await sauvegarder({ titre, categorie, description });
         reinitialiserFormulaire();
@@ -146,12 +146,10 @@ btnSoumettre.addEventListener("click", async () => {
     } catch (err) {
         console.error("Erreur :", err);
         afficherErreur("erreur-description", "Une erreur est survenue, réessayez.");
-    } finally {
-        setLoading(false);
     }
 });
 
-// ─── Affichage mur ────────────────────────────────────────────────────────────
+// Affichage mur 
 export async function afficherTout() {
     mur.innerHTML = "";
     const idees = await recupererIdees();
@@ -193,7 +191,7 @@ export async function afficherTout() {
 }
 setOnChangement(afficherTout);
 
-// ─── Édition ─────────────────────────────────────────────────────────────────
+// Édition 
 window.ouvrirEdition = function(id) {
     const idee = idees.find(i => i.id === id);
     if (!idee) return;
@@ -208,23 +206,46 @@ btnSauvegarder.addEventListener("click", async () => {
     const titre       = editTitre.value.trim();
     const categorie   = editCategorie.value;
     const description = editDescription.value.trim();
-    if (!titre || !categorie || !description) return;
+
+    // Effacer les erreurs précédentes
+    afficherErreur("erreur-edit-titre", null);
+    afficherErreur("erreur-edit-description", null);
+
+    if (!categorie) return;
+
+    const erreurTitre = validerTitre(titre);
+    if (erreurTitre) {
+        afficherErreur("erreur-edit-titre", erreurTitre);
+        return;
+    }
+
+    const erreurDescription = validerDescription(description);
+    if (erreurDescription) {
+        afficherErreur("erreur-edit-description", erreurDescription);
+        return;
+    }
 
     const idee = idees.find(i => i.id === idEnCoursEdition);
     if (!idee) return;
 
-    const succes = await modifierIdee(idEnCoursEdition, titre, categorie, description);
-    if (!succes) {
-        alert("Erreur lors de la modification.");
-        return;
-    }
-    idees = await recupererIdees();
-    afficherTout();
-    modalEditer.hide();
-    idEnCoursEdition = null;
+    
+    try {
+        const succes = await modifierIdee(idEnCoursEdition, titre, categorie, description);
+        if (!succes) {
+            afficherErreur("erreur-edit-description", "Erreur lors de la modification.");
+            return;
+        }
+        idees = await recupererIdees();
+        afficherTout();
+        modalEditer.hide();
+        idEnCoursEdition = null;
+    } catch (err) {
+        console.error("Erreur :", err);
+        afficherErreur("erreur-edit-description", "Une erreur est survenue, réessayez.");
+    } 
 });
 
-// ─── Suppression ─────────────────────────────────────────────────────────────
+// Suppression 
 window.supprimerUneIdee = async (id) => {
     if (!confirm("Supprimer définitivement cette idée ?")) return;
     const succes = await supprimerIdee(id);
@@ -236,5 +257,5 @@ window.supprimerUneIdee = async (id) => {
     afficherTout();
 };
 
-// ─── Init ─────────────────────────────────────────────────────────────────────
+// Init 
 afficherTout();
